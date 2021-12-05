@@ -3,37 +3,58 @@ import os
 import cv2
 
 execution_path = os.getcwd()
-print(execution_path)
-if os.path.exists('images_with_animals'):
+
+print('execution_path: ', execution_path)
+
+dir_name = os.path.join(execution_path, 'фоточки')
+our_directory = os.listdir(dir_name)
+
+print('our_directory: ', our_directory)
+
+directory = os.path.join(dir_name ,'animals_good')
+
+print('directory: ', directory)
+
+if os.path.exists(os.path.join(dir_name, 'animals_good')):
     pass
 else:
-    os.mkdir('images_with_animals')
+    os.mkdir(os.path.join(dir_name, 'animals_good'))
 
-directory = execution_path+'\images_with_animals'
+count = 1
 
 detector = ObjectDetection()
 detector.setModelTypeAsYOLOv3()
-detector.setModelPath(os.path.join(execution_path , "yolo.h5"))
+detector.setModelPath(os.path.join(execution_path, "yolo.h5"))
 detector.loadModel()
-detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path , "q.JPG"), output_image_path=os.path.join(execution_path , "q_res.JPG"), minimum_percentage_probability=70)
 
-#print(detections)
-list_values = ['person']
-detect_list = []
-for eachObject in detections:
-    #print(eachObject["name"] , " : ", eachObject["percentage_probability"], " : ", eachObject["box_points"] )
-    detect_list.append(eachObject["name"])
+for item in our_directory:
+    if item.endswith(".jpg") or item.endswith(".jpeg") or item.endswith(".JPG"):
+        print(item)
+        #img = cv2.imread(os.path.join(dir_name, f'{item}'), 1)
+        #print(img)
+        print(os.path.join(dir_name, str(item)))
+        detections = detector.detectObjectsFromImage(input_image=os.path.join(dir_name, str(item)),   ## сейчас вот тут происходит ошибка, инпут файл пустой пишетЮ,
+                                                     output_image_path=os.path.join(dir_name, f'result_{item}'),
+                                                     minimum_percentage_probability=40,
+                                                     display_object_name=False)
 
-amount_of_cross = list(set(list_values) & set(detect_list))
+        # print(detections)
+        list_values = ['person', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe'] ## это список животных, которые может распознать модель
+        detect_list = []
+        for eachObject in detections:
+            detect_list.append(eachObject["name"])
 
-if len(amount_of_cross) > 0:
-    #os.path.join(f'{execution_path}\images_with_animals', "people_res.jpg")
-    #os.path.join('D:/PYTHON/Hackaton/images_with_animals', "people_res.jpg")
-    #cv2.imwrite('D:/PYTHON/Hackaton/images_with_animals', "people_res.jpg")
+        amount_of_cross = list(set(list_values) & set(detect_list))
 
-    os.path.join(directory, "q.JPG")
+        print(amount_of_cross)
 
-    print('есть пересечение, можно добавлять в следующую папку')
-    #cv2.imwrite(os.path.join(directory , 'people_res.jpg'), 'people_res.jpg')
+        if len(amount_of_cross) > 0:
+            img = cv2.imread(os.path.join(dir_name, f'{item}'), 1)
+            cv2.imwrite(os.path.join(directory, f'{item}'), img)  ##Добавляет в папку следующую, если есть животное
 
-print(detect_list)
+            print('есть пересечение, можно добавлять в следующую папку: ', count)
+
+        count += 1
+        print(detect_list)
+
+

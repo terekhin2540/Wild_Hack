@@ -1,0 +1,3 @@
+Ссылка на модель YOLO, ее качать надо и просто в ту же папку добавлять, где и файл
+
+https://github.com/OlafenwaMoses/ImageAI/blob/master/imageai/Detection/README.md
